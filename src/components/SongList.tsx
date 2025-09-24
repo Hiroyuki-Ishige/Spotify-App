@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 interface SongListProps {
   isLoading: boolean;
@@ -40,9 +41,23 @@ interface SongListProps {
 }
 
 export function SongList(props: SongListProps) {
+  const [rotatedItems, setRotatedItems] = useState<Set<string>>(new Set());
+
+  const handleClick = (songId: string) => {
+    setRotatedItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(songId)) {
+        newSet.delete(songId);
+      } else {
+        newSet.add(songId);
+      }
+      return newSet;
+    });
+  };
+
   if (props.isLoading)
     return (
-      <div className="inset-0 flex justify-center items-center">
+      <div className="inset-0 flex justify-center items-center min-w-screen min-h-screen">
         <FontAwesomeIcon icon={faSpinner} spin size="3x" />
       </div>
     );
@@ -56,7 +71,17 @@ export function SongList(props: SongListProps) {
               href={song.external_urls.spotify}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-none cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gray-800/20 rounded-lg p-2"
+              onClick={(e) => {
+                e.preventDefault();
+                handleClick(song.id);
+                // Open in new tab after wiggle animation completes
+                setTimeout(() => {
+                  window.open(song.external_urls.spotify, "_blank");
+                }, 600);
+              }}
+              className={`flex-none cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gray-800/20 rounded-lg p-2 ${
+                rotatedItems.has(song.id) ? "animate-wiggle" : ""
+              }`}
             >
               <img
                 alt="thumbnail"

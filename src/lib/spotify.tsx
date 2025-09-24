@@ -91,3 +91,21 @@ export const getPlaylistById = async (token: string, playlistId: string) => {
     return null;
   }
 };
+
+// Search for songs by keyword
+export const searchSongs = async (token: string, keyword: string, limit: number, offset: number) => {
+  const response = await axios.get("https://api.spotify.com/v1/search", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      q: keyword,
+      type: "track",
+      limit: limit,
+      offset: offset,
+    },
+  });
+
+  console.log("Search Songs API Response:", response.data);
+  return response.data;
+};
